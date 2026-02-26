@@ -73,17 +73,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [isMobileBillOpen, setIsMobileBillOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-
-  React.useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const itemsPerPage = isMobile ? 9 : 15;
 
   const categories = ['All', ...Array.from(new Set(items.map(item => item.category)))] as string[];
 
@@ -92,14 +81,6 @@ export default function App() {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  // Reset to page 1 when search or category changes
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, activeCategory]);
 
   const handleItemClick = (item: GroceryItem) => {
     setSelectedItem(item);
@@ -221,14 +202,14 @@ export default function App() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-hidden p-2 md:p-6 pb-24 md:pb-6 flex flex-col">
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 grid-rows-3 md:grid-rows-4 lg:grid-rows-3 gap-2 md:gap-4 flex-1 min-h-0">
-            {paginatedItems.map(item => (
+        <div className="flex-1 overflow-y-auto p-2 md:p-6 pb-24 md:pb-6">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
+            {filteredItems.map(item => (
               <motion.div
                 key={item.id}
                 layoutId={item.id}
                 onClick={() => handleItemClick(item)}
-                className="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm hover:shadow-md border border-transparent hover:border-indigo-100 transition-all text-left group flex flex-col h-full active:scale-95 relative cursor-pointer overflow-hidden"
+                className="bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-sm hover:shadow-md border border-transparent hover:border-indigo-100 transition-all text-left group flex flex-col h-full active:scale-95 relative cursor-pointer"
               >
                 <button
                   onClick={(e) => handleEditClick(e, item)}
@@ -239,9 +220,9 @@ export default function App() {
                 <ProductImage 
                   image={item.image} 
                   name={item.name} 
-                  className="flex-1 min-h-0 w-full mb-1 md:mb-2" 
+                  className="h-20 sm:h-32 md:h-40 w-full mb-1 md:mb-4" 
                 />
-                <div className="mt-auto w-full shrink-0">
+                <div className="mt-auto w-full">
                   <h3 className="font-bold text-gray-900 leading-tight mb-0.5 text-[10px] sm:text-sm md:text-base truncate">{item.name}</h3>
                   <div className="flex justify-between items-center">
                     <p className="text-[10px] sm:text-xs md:text-sm text-gray-500">₹{item.pricePerKg}</p>
@@ -253,28 +234,6 @@ export default function App() {
               </motion.div>
             ))}
           </div>
-          
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-4 pt-4 border-t border-gray-200 shrink-0">
-              <button 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <span className="text-sm font-medium text-gray-600">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
