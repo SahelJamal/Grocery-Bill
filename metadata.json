@@ -1,0 +1,5 @@
+{
+  "name": "Grocery Billing App",
+  "description": "A simple, touch-friendly point of sale interface for grocery billing.",
+  "requestFramePermissions": []
+}
